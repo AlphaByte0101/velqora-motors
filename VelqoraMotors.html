@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Velqora Motors // Showroom & Comparateur</title>
+
+    <meta name="description" content="Velqora Motors — Le showroom digital des hypercars et voitures d'exception.">
+    <meta name="theme-color" content="#050507">
+    <meta property="og:title" content="Velqora Motors // Showroom & Comparateur">
+    <meta property="og:description" content="Le showroom digital des hypercars et voitures d'exception.">
+    <meta property="og:image" content="VelqoraMotorsLogo.jpg">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="fr_FR">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" href="VelqoraMotorsLogo.jpg">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: {
+                colors: { obsidian: '#050507', charcoal: { 800: '#121318', 900: '#0c0d10' } },
+                fontFamily: { sans: ['Inter', 'sans-serif'] }
+            } }
+        }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- JS modulaire — l'ordre est important -->
+    <script src="js/config.js" defer></script>
+    <script src="js/data-cars.js" defer></script>
+    <script src="js/data-translations.js" defer></script>
+    <script src="js/utils.js" defer></script>
+    <script src="js/i18n.js" defer></script>
+    <script src="js/cursor.js" defer></script>
+    <script src="js/lightbox.js" defer></script>
+    <script src="js/cookies.js" defer></script>
+    <script src="js/catalog.js" defer></script>
+    <script src="js/details.js" defer></script>
+    <script src="js/garage.js" defer></script>
+    <script src="js/comparator.js" defer></script>
+    <script src="js/views.js" defer></script>
+    <script src="js/app.js" defer></script>
+</head>
+<body class="bg-obsidian text-slate-100 min-h-screen flex flex-col justify-between selection:bg-white selection:text-black" data-cursor="ring">
+
+    <div id="custom-cursor" aria-hidden="true"></div>
+    <div id="custom-cursor-dot" aria-hidden="true"></div>
+
+    <header class="sticky top-0 z-40 glass-dark border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <a href="#" onclick="switchView('catalog'); return false;" class="flex items-center space-x-3 cursor-pointer">
+                <img src="VelqoraMotorsLogo.jpg" alt="Velqora Motors" class="h-11 w-auto object-contain"
+                     onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div style="display:none" class="w-10 h-10 rounded-xl bg-gradient-to-br from-zinc-100 to-zinc-500 flex items-center justify-center text-black font-black text-xl shadow-2xl">V</div>
+                <div><span class="text-lg font-extrabold tracking-widest text-white">Velqora Motors</span></div>
+            </a>
+            <div class="flex items-center space-x-2 sm:space-x-4">
+                <nav class="hidden md:flex items-center space-x-1" aria-label="Navigation principale" data-i18n-aria-label="nav.main">
+                    <button onclick="switchView('catalog')" id="nav-catalog" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-white/10 text-white shadow-inner"><i class="fa-solid fa-gauge-high mr-2"></i><span data-i18n="nav.showroom">Showroom</span></button>
+                    <button onclick="switchView('garage')" id="nav-garage" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all text-zinc-400"><i class="fa-solid fa-bookmark mr-2"></i><span data-i18n="nav.garage">Garage</span> (<span id="garage-count">0</span>)</button>
+                    <button onclick="switchView('comparator')" id="nav-comparator" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all text-zinc-400 inline-flex items-center">
+                        <i class="fa-solid fa-scale-balanced mr-2"></i>
+                        <span data-i18n="nav.comparator">Comparateur</span>
+                        <span id="compare-badge" class="ml-2 bg-white text-black text-[10px] min-w-[18px] h-[18px] px-1.5 rounded-full inline-flex items-center justify-center font-black hidden">0</span>
+                    </button>
+                    <button onclick="switchView('cursor')" id="nav-cursor" class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all text-zinc-400 inline-flex items-center">
+                        <i class="fa-solid fa-arrow-pointer mr-2"></i>
+                        <span data-i18n="nav.cursor">Curseur</span>
+                    </button>
+                </nav>
+
+                <div id="lang-dropdown-desktop" class="relative">
+                    <button onclick="toggleLangMenu(event)" aria-haspopup="listbox" aria-expanded="false" aria-label="Changer de langue" data-i18n-aria-label="lang.change"
+                            class="px-3 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors flex items-center gap-2 text-xs font-bold text-zinc-300">
+                        <span id="lang-flag-current" aria-hidden="true">🇫🇷</span>
+                        <span id="lang-code-current">FR</span>
+                        <i class="fa-solid fa-chevron-down text-[9px] text-zinc-500" aria-hidden="true"></i>
+                    </button>
+                    <div id="lang-menu" role="listbox" class="hidden absolute right-0 top-full mt-2 w-56 glass-dark rounded-2xl border border-white/15 overflow-hidden shadow-2xl z-50"></div>
+                </div>
+
+                <button onclick="toggleMobileMenu()" aria-label="Ouvrir le menu de navigation" data-i18n-aria-label="nav.openMenu" class="md:hidden w-10 h-10 rounded-xl bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-300">
+                    <i class="fa-solid fa-bars" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden px-4 pt-3 pb-5 space-y-2 border-t border-white/10 bg-charcoal-900">
+            <button onclick="switchView('catalog'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-medium flex items-center space-x-3 text-sm hover:bg-white/5">
+                <i class="fa-solid fa-gauge-high text-zinc-400"></i><span data-i18n="nav.showroom">Showroom</span>
+            </button>
+            <button onclick="switchView('garage'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-medium flex items-center space-x-3 text-sm hover:bg-white/5">
+                <i class="fa-solid fa-bookmark text-zinc-400"></i><span data-i18n="nav.garage">Garage</span>
+                <span id="mobile-garage-count" class="ml-auto bg-white text-black text-[10px] min-w-[18px] h-[18px] px-1.5 rounded-full inline-flex items-center justify-center font-black">0</span>
+            </button>
+            <button onclick="switchView('comparator'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-medium flex items-center space-x-3 text-sm hover:bg-white/5">
+                <i class="fa-solid fa-scale-balanced text-zinc-400"></i><span data-i18n="nav.comparator">Comparateur</span>
+                <span id="mobile-compare-count" class="ml-auto bg-white text-black text-[10px] min-w-[18px] h-[18px] px-1.5 rounded-full inline-flex items-center justify-center font-black">0</span>
+            </button>
+            <button onclick="switchView('cursor'); toggleMobileMenu();" class="w-full text-left px-4 py-3 rounded-xl font-medium flex items-center space-x-3 text-sm hover:bg-white/5">
+                <i class="fa-solid fa-arrow-pointer text-zinc-400"></i><span data-i18n="nav.cursor">Curseur</span>
+            </button>
+
+            <div class="pt-3 mt-3 border-t border-white/10">
+                <p class="px-2 pb-2 text-[10px] font-black uppercase tracking-widest text-zinc-500" data-i18n="lang.change">Changer de langue</p>
+                <div class="flex flex-wrap gap-2 px-2" id="lang-flags-mobile"></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full space-y-12">
+
+        <!-- ========== VIEW : CATALOGUE ========== -->
+        <div id="view-catalog" role="region" aria-label="Showroom" data-i18n-aria-label="page.catalog.aria" class="space-y-10">
+            <div class="relative rounded-3xl overflow-hidden border border-white/10 bg-gradient-to-r from-charcoal-900 via-charcoal-800 to-obsidian p-8 sm:p-12 lg:p-16 flex flex-col justify-center min-h-[420px] shadow-2xl">
+                <div class="absolute inset-0 opacity-30 bg-cover bg-center mix-blend-luminosity" style="background-image: url('https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&w=1920&q=80')"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-obsidian via-transparent to-transparent opacity-90"></div>
+                <div class="relative z-10 max-w-2xl space-y-6">
+                    <h1 class="text-4xl sm:text-6xl font-black tracking-tight leading-none text-white">RAW POWER. <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-zinc-200 via-zinc-400 to-zinc-600">ZERO COMPROMISE.</span></h1>
+                    <p class="text-zinc-400 text-sm sm:text-base leading-relaxed" data-i18n="hero.desc">Entrez dans l'élite de l'automobile d'exception. Analysez les performances extrêmes, comparez les chronos et constituez votre garage de rêve.</p>
+                    <div class="flex flex-wrap gap-4 pt-2">
+                        <a href="#showroom-grid" class="px-6 py-3.5 rounded-xl bg-white text-black font-bold text-xs uppercase tracking-wider transition-all shadow-xl shadow-white/5 flex items-center space-x-2"><span data-i18n="hero.explore">Explorer le Showroom</span><i class="fa-solid fa-arrow-down text-[10px]"></i></a>
+                        <button onclick="switchView('comparator')" class="px-6 py-3.5 rounded-xl bg-white/5 backdrop-blur-md text-white font-bold text-xs uppercase tracking-wider border border-white/15 transition-all flex items-center space-x-2"><i class="fa-solid fa-scale-balanced text-zinc-300"></i><span data-i18n="hero.compare">Lancer le Comparateur</span></button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="showroom-grid" class="glass-dark p-6 rounded-3xl space-y-6">
+                <div class="flex flex-col lg:flex-row gap-4 items-center justify-between">
+                    <div class="relative w-full lg:w-96">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm"></i>
+                        <input type="text" id="search-input" data-i18n-placeholder="search.placeholder" data-i18n-aria-label="search.aria" placeholder="Rechercher (ex: bug tour, ferrari hybride...)" aria-label="Rechercher un véhicule" class="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-charcoal-800/80 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-white/30 text-xs font-semibold tracking-wide">
+                    </div>
+                    <div class="flex flex-wrap gap-2 w-full lg:w-auto" id="energy-filters">
+                        <button onclick="setEnergy('all')" id="energy-all" class="energy-btn px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-white text-black shadow-lg" data-i18n="energy.all">Tous</button>
+                        <button onclick="setEnergy('Thermique')" id="energy-Thermique" class="energy-btn px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-white/5 text-zinc-400 border border-white/10" data-i18n="energy.Thermique">Thermique</button>
+                        <button onclick="setEnergy('Hybride')" id="energy-Hybride" class="energy-btn px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-white/5 text-zinc-400 border border-white/10" data-i18n="energy.Hybride">Hybride</button>
+                        <button onclick="setEnergy('Électrique')" id="energy-Électrique" class="energy-btn px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all bg-white/5 text-zinc-400 border border-white/10" data-i18n="energy.Électrique">Électrique</button>
+                    </div>
+                </div>
+
+                <button id="mobile-filter-toggle" onclick="toggleMobileFilters()" class="hidden w-full py-2.5 rounded-xl bg-white/5 border border-white/10 items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider text-zinc-300">
+                    <i class="fa-solid fa-sliders text-xs"></i>
+                    <span id="mobile-filter-label" data-i18n="filters.show">Afficher les filtres avancés</span>
+                    <i id="mobile-filter-chevron" class="fa-solid fa-chevron-down text-[10px] transition-transform"></i>
+                </button>
+
+                <div id="mobile-filters-panel" class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-white/10 text-xs">
+                    <div class="space-y-1.5">
+                        <label class="font-bold uppercase tracking-wider text-zinc-400" for="brand-filter" data-i18n="filters.brand">Marque</label>
+                        <select id="brand-filter" class="w-full px-3.5 py-3 rounded-xl bg-charcoal-800/80 border border-white/10 text-white focus:outline-none focus:border-white/30 font-medium">
+                            <option value="all" data-i18n="filters.allBrands">Toutes les marques</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="font-bold uppercase tracking-wider text-zinc-400" for="price-filter"><span data-i18n="filters.maxPrice">Prix Max</span>: <span id="price-output" class="text-white font-black">8 000 000 €</span></label>
+                        <input type="range" id="price-filter" min="100000" max="8000000" step="50000" value="8000000" class="w-full accent-white cursor-pointer mt-3">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="font-bold uppercase tracking-wider text-zinc-400" for="sort-select" data-i18n="filters.sort">Trier par</label>
+                        <select id="sort-select" class="w-full px-3.5 py-3 rounded-xl bg-charcoal-800/80 border border-white/10 text-white focus:outline-none focus:border-white/30 font-medium">
+                            <option value="featured" data-i18n="sort.featured">Sélection vedette</option>
+                            <option value="price-desc" data-i18n="sort.priceDesc">Prix décroissant</option>
+                            <option value="price-asc" data-i18n="sort.priceAsc">Prix croissant</option>
+                            <option value="power-desc" data-i18n="sort.powerDesc">Puissance maximale</option>
+                            <option value="speed-desc" data-i18n="sort.speedDesc">Vitesse maximale</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="results-counter" class="text-xs text-zinc-500 font-semibold tracking-wide" aria-live="polite"></div>
+            <div id="cars-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+            <div id="no-results" class="hidden text-center py-20 space-y-4">
+                <div class="w-16 h-16 mx-auto rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-zinc-400 text-2xl"><i class="fa-solid fa-car-slash"></i></div>
+                <h3 class="text-lg font-bold" data-i18n="noResults.title">Aucun véhicule ne correspond</h3>
+                <p class="text-zinc-500 text-xs max-w-sm mx-auto" data-i18n="noResults.desc">Modifiez vos critères ou réinitialisez les filtres pour explorer le catalogue.</p>
+                <button onclick="resetFilters()" class="px-5 py-2.5 rounded-xl bg-white text-black font-bold text-xs uppercase tracking-wider shadow" data-i18n="noResults.reset">Réinitialiser</button>
+            </div>
+        </div>
+
+        <!-- ========== VIEW : DÉTAILS ========== -->
+        <div id="view-details" role="region" aria-label="Fiche détaillée" data-i18n-aria-label="page.details.aria" class="hidden space-y-8">
+            <button onclick="switchView('catalog')" class="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-charcoal-800 border border-white/10 font-bold text-xs uppercase tracking-wider transition-colors text-zinc-300">
+                <i class="fa-solid fa-arrow-left"></i><span data-i18n="details.back">Retour au showroom</span>
+            </button>
+            <div id="details-content" class="space-y-8"></div>
+        </div>
+
+        <!-- ========== VIEW : GARAGE ========== -->
+        <div id="view-garage" role="region" aria-label="Mon garage" data-i18n-aria-label="page.garage.aria" class="hidden space-y-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-black tracking-tight" data-i18n="garage.title">Mon Garage Personnel</h2>
+                    <p class="text-zinc-400 text-xs sm:text-sm mt-1" data-i18n="garage.desc">Retrouvez l'ensemble de vos véhicules sauvegardés en favoris.</p>
+                </div>
+                <button onclick="switchView('catalog')" class="px-5 py-2.5 rounded-xl bg-white text-black font-bold text-xs uppercase tracking-wider"><i class="fa-solid fa-plus mr-2"></i><span data-i18n="garage.addModels">Ajouter des modèles</span></button>
+            </div>
+            <div id="garage-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <div id="garage-empty" class="glass-dark p-16 rounded-3xl text-center space-y-6">
+                <div class="w-16 h-16 mx-auto rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-zinc-400 text-2xl"><i class="fa-solid fa-bookmark"></i></div>
+                <div class="max-w-sm mx-auto space-y-2">
+                    <h3 class="text-lg font-bold" data-i18n="garage.emptyTitle">Votre garage est vide</h3>
+                    <p class="text-zinc-500 text-xs" data-i18n="garage.emptyDesc">Cliquez sur l'icône de favoris (signet) sur n'importe quelle voiture pour l'ajouter ici.</p>
+                </div>
+                <button onclick="switchView('catalog')" class="px-6 py-3 rounded-xl bg-white text-black font-bold text-xs uppercase tracking-wider shadow" data-i18n="garage.explore">Explorer le Showroom</button>
+            </div>
+        </div>
+
+        <!-- ========== VIEW : COMPARATEUR ========== -->
+        <div id="view-comparator" role="region" aria-label="Comparateur" data-i18n-aria-label="page.comparator.aria" class="hidden space-y-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-black tracking-tight" data-i18n="comparator.title">Comparateur de Performances</h2>
+                    <p class="text-zinc-400 text-xs sm:text-sm mt-1" data-i18n="comparator.desc">Sélectionnez jusqu'à 4 véhicules pour confronter leurs fiches techniques en temps réel.</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="clearComparator()" class="px-4 py-2.5 rounded-xl bg-red-500/10 text-red-400 font-bold text-xs uppercase tracking-wider transition-colors border border-red-500/20"><i class="fa-solid fa-trash-can mr-2"></i><span data-i18n="comparator.clear">Vider</span></button>
+                    <button onclick="switchView('catalog')" class="px-4 py-2.5 rounded-xl bg-white text-black font-bold text-xs uppercase tracking-wider transition-colors"><i class="fa-solid fa-plus mr-2"></i><span data-i18n="comparator.add">Ajouter</span></button>
+                </div>
+            </div>
+            <div id="comparator-slots" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+            <div id="comparator-table-container" class="hidden glass-dark rounded-3xl overflow-hidden shadow-2xl">
+                <div class="p-6 border-b border-white/10 bg-charcoal-900/50 flex items-center justify-between">
+                    <div>
+                        <h3 class="font-bold text-sm tracking-wide uppercase flex items-center space-x-2"><i class="fa-solid fa-chart-line text-white"></i><span data-i18n="comparator.matrix">Matrice Comparative</span></h3>
+                        <p class="text-[11px] text-zinc-400 mt-0.5" data-i18n="comparator.matrixHint">Les meilleures performances sont surlignées automatiquement en vert.</p>
+                    </div>
+                </div>
+                <div class="overflow-x-auto"><table class="w-full text-left border-collapse" id="comparator-matrix"></table></div>
+            </div>
+            <div id="comparator-empty" class="glass-dark p-16 rounded-3xl text-center space-y-6">
+                <div class="w-16 h-16 mx-auto rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-zinc-400 text-2xl"><i class="fa-solid fa-scale-balanced"></i></div>
+                <div class="max-w-sm mx-auto space-y-2">
+                    <h3 class="text-lg font-bold" data-i18n="comparator.emptyTitle">Aucun véhicule sélectionné</h3>
+                    <p class="text-zinc-500 text-xs" data-i18n="comparator.emptyDesc">Sélectionnez au moins 2 voitures depuis le showroom pour lancer la comparaison.</p>
+                </div>
+                <button onclick="switchView('catalog')" class="px-6 py-3 rounded-xl bg-white text-black font-bold text-xs uppercase tracking-wider shadow" data-i18n="comparator.emptyExplore">Explorer le Showroom</button>
+            </div>
+        </div>
+
+        <!-- ========== VIEW : CURSEUR ========== -->
+        <div id="view-cursor" role="region" aria-label="Personnalisation du curseur" data-i18n-aria-label="page.cursor.aria" class="hidden space-y-8">
+            <button onclick="switchView('catalog')" class="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-charcoal-800 border border-white/10 font-bold text-xs uppercase tracking-wider transition-colors text-zinc-300">
+                <i class="fa-solid fa-arrow-left"></i><span data-i18n="details.back">Retour au showroom</span>
+            </button>
+            <div class="glass-dark p-8 sm:p-12 rounded-3xl max-w-4xl mx-auto">
+                <div class="flex items-center space-x-3 mb-3">
+                    <i class="fa-solid fa-arrow-pointer text-white text-2xl"></i>
+                    <h1 class="text-2xl sm:text-4xl font-black tracking-tight text-white" data-i18n="cursor.title">Choisir mon curseur</h1>
+                </div>
+                <p class="text-zinc-400 text-sm mb-8" data-i18n="cursor.desc">Personnalisez votre expérience de navigation en choisissant le style de curseur qui vous correspond. Votre choix est sauvegardé automatiquement.</p>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4" id="cursor-grid"></div>
+                <div class="mt-8 pt-6 border-t border-white/10 flex items-center justify-between text-xs text-zinc-500 flex-wrap gap-3">
+                    <p><i class="fa-solid fa-circle-info mr-1"></i><span data-i18n="cursor.notice">Le curseur personnalisé est désactivé automatiquement sur les appareils tactiles.</span></p>
+                    <button onclick="resetCursorChoice()" class="text-zinc-400 font-bold uppercase tracking-wider"><i class="fa-solid fa-rotate-left mr-1"></i><span data-i18n="cursor.reset">Réinitialiser</span></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== VIEW : MENTIONS LÉGALES ========== -->
+        <div id="view-legal" role="region" aria-label="Mentions légales" class="hidden space-y-8">
+            <button onclick="switchView('catalog')" class="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-charcoal-800 border border-white/10 font-bold text-xs uppercase tracking-wider transition-colors text-zinc-300">
+                <i class="fa-solid fa-arrow-left"></i><span data-i18n="details.back">Retour au showroom</span>
+            </button>
+            <div class="glass-dark p-8 sm:p-12 rounded-3xl max-w-4xl mx-auto legal-page">
+                <div class="flex items-center space-x-3 mb-6">
+                    <i class="fa-solid fa-file-contract text-white text-2xl"></i>
+                    <h1 class="text-2xl sm:text-4xl font-black tracking-tight text-white" data-i18n="legal.title">Mentions Légales</h1>
+                </div>
+                <div class="legal-notice hidden" data-legal-notice><i class="fa-solid fa-circle-info"></i><span data-i18n="legal.notice">Le texte juridique détaillé est disponible en français.</span></div>
+                <div class="text-sm text-zinc-300 leading-relaxed">
+                    <h2>Nature du site</h2>
+                    <p>Le site Velqora Motors est un <strong>site vitrine informatif</strong> dédié à la présentation et la comparaison de véhicules. Il ne propose <strong>aucune vente, réservation ou commande</strong> de véhicule. Aucune transaction financière n'est effectuée sur ce site.</p>
+                    <h2>Propriété intellectuelle</h2>
+                    <p>L'ensemble des contenus (textes, design, logos) est protégé par le droit d'auteur. Les images des véhicules sont la propriété de leurs marques respectives et utilisées à titre illustratif dans le cadre du droit de citation.</p>
+                    <h2>Responsabilité</h2>
+                    <p>Les informations présentées (prix, performances, caractéristiques) sont fournies <strong>à titre purement indicatif</strong>. Elles ne constituent ni une offre commerciale, ni un engagement contractuel.</p>
+                    <h2>Litiges</h2>
+                    <p>Le présent site est soumis au droit français. En cas de litige, les tribunaux français seront seuls compétents.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== VIEW : CONFIDENTIALITÉ ========== -->
+        <div id="view-privacy" role="region" aria-label="Politique de confidentialité" class="hidden space-y-8">
+            <button onclick="switchView('catalog')" class="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-charcoal-800 border border-white/10 font-bold text-xs uppercase tracking-wider transition-colors text-zinc-300">
+                <i class="fa-solid fa-arrow-left"></i><span data-i18n="details.back">Retour au showroom</span>
+            </button>
+            <div class="glass-dark p-8 sm:p-12 rounded-3xl max-w-4xl mx-auto legal-page">
+                <div class="flex items-center space-x-3 mb-6">
+                    <i class="fa-solid fa-shield-halved text-white text-2xl"></i>
+                    <h1 class="text-2xl sm:text-4xl font-black tracking-tight text-white" data-i18n="privacy.title">Politique de Confidentialité</h1>
+                </div>
+                <p class="text-zinc-400 text-sm mb-6" data-i18n="privacy.subtitle">Conformément au Règlement Général sur la Protection des Données (RGPD)</p>
+                <div class="legal-notice hidden" data-legal-notice><i class="fa-solid fa-circle-info"></i><span data-i18n="legal.notice">Le texte juridique détaillé est disponible en français.</span></div>
+                <div class="text-sm text-zinc-300 leading-relaxed">
+                    <h2>Responsable de traitement</h2>
+                    <p>Velqora Motors SAS, dont les coordonnées figurent dans les <a href="#" onclick="switchView('legal'); return false;">mentions légales</a>, est responsable du traitement des données collectées sur ce site.</p>
+                    <h2>Données collectées et finalités</h2>
+                    <p>Velqora Motors est un site informatif. Nous ne collectons <strong>aucune donnée personnelle</strong>. Seules sont utilisées :</p>
+                    <ul>
+                        <li>Des données de navigation anonymisées pour la mesure d'audience.</li>
+                        <li>Vos préférences locales sauvegardées <strong>uniquement dans votre navigateur</strong> via <code>localStorage</code>.</li>
+                    </ul>
+                    <h2>Bases légales</h2>
+                    <p>Le traitement est fondé sur :</p>
+                    <ul>
+                        <li>Votre <strong>consentement</strong> (pour les cookies non essentiels).</li>
+                        <li>L'<strong>intérêt légitime</strong> de Velqora Motors (pour la sécurité du site).</li>
+                    </ul>
+                    <h2>Durée de conservation</h2>
+                    <p>Les données de navigation sont conservées 13 mois maximum. Les préférences restent sur votre appareil jusqu'à leur suppression.</p>
+                    <h2>Vos droits</h2>
+                    <p>Conformément au RGPD (articles 15 à 22), vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation, d'opposition et de portabilité.</p>
+                    <p>Vous pouvez également introduire une réclamation auprès de la CNIL : <a href="https://www.cnil.fr" target="_blank" rel="noopener">www.cnil.fr</a>.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== VIEW : COOKIES ========== -->
+        <div id="view-cookies" role="region" aria-label="Gestion des cookies" class="hidden space-y-8">
+            <button onclick="switchView('catalog')" class="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-charcoal-800 border border-white/10 font-bold text-xs uppercase tracking-wider transition-colors text-zinc-300">
+                <i class="fa-solid fa-arrow-left"></i><span data-i18n="details.back">Retour au showroom</span>
+            </button>
+            <div class="glass-dark p-8 sm:p-12 rounded-3xl max-w-4xl mx-auto legal-page">
+                <div class="flex items-center space-x-3 mb-6">
+                    <i class="fa-solid fa-cookie-bite text-white text-2xl"></i>
+                    <h1 class="text-2xl sm:text-4xl font-black tracking-tight text-white" data-i18n="cookies.pageTitle">Gestion des Cookies</h1>
+                </div>
+                <p class="text-zinc-400 text-sm mb-6" data-i18n="cookies.subtitle">Conformément à la directive ePrivacy et aux recommandations de la CNIL</p>
+                <div class="legal-notice hidden" data-legal-notice><i class="fa-solid fa-circle-info"></i><span data-i18n="legal.notice">Le texte juridique détaillé est disponible en français.</span></div>
+                <div class="text-sm text-zinc-300 leading-relaxed">
+                    <h2>Qu'est-ce qu'un cookie ?</h2>
+                    <p>Un cookie est un petit fichier texte déposé sur votre terminal lors de la visite d'un site.</p>
+                    <h2>Types de cookies utilisés</h2>
+                    <ul>
+                        <li><strong>Cookies essentiels :</strong> sauvegarde du garage, du comparateur et du curseur via <code>localStorage</code>.</li>
+                        <li><strong>Cookies de mesure d'audience :</strong> analyse de la fréquentation (soumis à consentement).</li>
+                        <li><strong>Cookies de personnalisation :</strong> mémorisation de vos préférences (soumis à consentement).</li>
+                    </ul>
+                    <h2>Durée de conservation du choix</h2>
+                    <p>Conformément aux recommandations de la CNIL, votre choix est conservé pendant 6 mois.</p>
+                    <h2>Modifier vos préférences</h2>
+                    <p>Vous pouvez modifier votre choix à tout moment :</p>
+                    <div class="mt-4 flex flex-wrap gap-3">
+                        <button onclick="resetCookieConsent()" class="px-5 py-2.5 rounded-xl bg-white/10 text-white font-bold text-xs uppercase tracking-wider transition-colors border border-white/15">
+                            <i class="fa-solid fa-rotate-left mr-2"></i><span data-i18n="cookies.reset">Réinitialiser mes préférences</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== VIEW : CGU ========== -->
+        <div id="view-cgv" role="region" aria-label="Conditions générales d'utilisation" class="hidden space-y-8">
+            <button onclick="switchView('catalog')" class="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-charcoal-800 border border-white/10 font-bold text-xs uppercase tracking-wider transition-colors text-zinc-300">
+                <i class="fa-solid fa-arrow-left"></i><span data-i18n="details.back">Retour au showroom</span>
+            </button>
+            <div class="glass-dark p-8 sm:p-12 rounded-3xl max-w-4xl mx-auto legal-page">
+                <div class="flex items-center space-x-3 mb-6">
+                    <i class="fa-solid fa-file-signature text-white text-2xl"></i>
+                    <h1 class="text-2xl sm:text-4xl font-black tracking-tight text-white" data-i18n="cgv.title">Conditions Générales d'Utilisation</h1>
+                </div>
+                <div class="legal-notice hidden" data-legal-notice><i class="fa-solid fa-circle-info"></i><span data-i18n="legal.notice">Le texte juridique détaillé est disponible en français.</span></div>
+                <div class="text-sm text-zinc-300 leading-relaxed">
+                    <h2>1. Objet</h2>
+                    <p>Les présentes CGU régissent l'accès et l'utilisation du site Velqora Motors. Le site est un <strong>outil informatif</strong>. Il ne permet <strong>aucune transaction commerciale</strong>.</p>
+                    <h2>2. Accès au site</h2>
+                    <p>Le site est accessible gratuitement. Velqora Motors se réserve le droit de modifier, suspendre ou interrompre l'accès à tout moment.</p>
+                    <h2>3. Fonctionnalités proposées</h2>
+                    <ul>
+                        <li><strong>Showroom :</strong> consultation d'un catalogue à titre informatif.</li>
+                        <li><strong>Comparateur :</strong> confrontation technique de 2 à 4 véhicules.</li>
+                        <li><strong>Garage personnel :</strong> sauvegarde locale de vos favoris.</li>
+                        <li><strong>Personnalisation :</strong> choix du style de curseur.</li>
+                    </ul>
+                    <p>Vos favoris, comparaisons et préférences restent <strong>stockés uniquement sur votre appareil</strong>.</p>
+                    <h2>4. Informations présentées</h2>
+                    <p>Les caractéristiques techniques et prix sont fournis <strong>à titre purement informatif</strong>.</p>
+                    <h2>5. Propriété intellectuelle</h2>
+                    <p>L'ensemble des contenus est la propriété exclusive de Velqora Motors ou de ses partenaires.</p>
+                    <h2>6. Responsabilité de l'utilisateur</h2>
+                    <p>Toute tentative de piratage ou d'extraction massive de données pourra entraîner un blocage d'accès.</p>
+                    <h2>7. Droit applicable</h2>
+                    <p>Les présentes CGU sont soumises au droit français.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== VIEW : ACCESSIBILITÉ ========== -->
+        <div id="view-accessibility" role="region" aria-label="Déclaration d'accessibilité" class="hidden space-y-8">
+            <button onclick="switchView('catalog')" class="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-charcoal-800 border border-white/10 font-bold text-xs uppercase tracking-wider transition-colors text-zinc-300">
+                <i class="fa-solid fa-arrow-left"></i><span data-i18n="details.back">Retour au showroom</span>
+            </button>
+            <div class="glass-dark p-8 sm:p-12 rounded-3xl max-w-4xl mx-auto legal-page">
+                <div class="flex items-center space-x-3 mb-6">
+                    <i class="fa-solid fa-universal-access text-white text-2xl"></i>
+                    <h1 class="text-2xl sm:text-4xl font-black tracking-tight text-white" data-i18n="accessibility.title">Déclaration d'Accessibilité</h1>
+                </div>
+                <div class="legal-notice hidden" data-legal-notice><i class="fa-solid fa-circle-info"></i><span data-i18n="legal.notice">Le texte juridique détaillé est disponible en français.</span></div>
+                <div class="text-sm text-zinc-300 leading-relaxed">
+                    <p>Velqora Motors s'engage à rendre son site internet accessible conformément à l'article 47 de la loi n° 2005-102 du 11 février 2005 et au RGAA version 4.1.</p>
+                    <h2>État de conformité</h2>
+                    <p>Le site est <strong class="text-amber-400">partiellement conforme</strong> avec le RGAA 4.1.</p>
+                    <h2>Contenus non accessibles</h2>
+                    <ul>
+                        <li>Certaines images décoratives peuvent ne pas avoir d'attribut <code>alt</code> détaillé.</li>
+                        <li>Certains contrastes de texte dans les zones grisées sont inférieurs à 4.5:1.</li>
+                    </ul>
+                    <h2>Voie de recours</h2>
+                    <p>Si vous constatez un défaut d'accessibilité, vous pouvez saisir le Défenseur des droits : <a href="https://formulaire.defenseurdesdroits.fr" target="_blank" rel="noopener">formulaire.defenseurdesdroits.fr</a>.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== VIEW : AGEC ========== -->
+        <div id="view-agec" role="region" aria-label="Transparence et environnement" class="hidden space-y-8">
+            <button onclick="switchView('catalog')" class="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-charcoal-800 border border-white/10 font-bold text-xs uppercase tracking-wider transition-colors text-zinc-300">
+                <i class="fa-solid fa-arrow-left"></i><span data-i18n="details.back">Retour au showroom</span>
+            </button>
+            <div class="glass-dark p-8 sm:p-12 rounded-3xl max-w-4xl mx-auto legal-page">
+                <div class="flex items-center space-x-3 mb-6">
+                    <i class="fa-solid fa-leaf text-white text-2xl"></i>
+                    <h1 class="text-2xl sm:text-4xl font-black tracking-tight text-white" data-i18n="agec.title">Transparence & Environnement</h1>
+                </div>
+                <div class="legal-notice hidden" data-legal-notice><i class="fa-solid fa-circle-info"></i><span data-i18n="legal.notice">Le texte juridique détaillé est disponible en français.</span></div>
+                <div class="text-sm text-zinc-300 leading-relaxed">
+                    <h2>Nature du site</h2>
+                    <p>Velqora Motors est un site <strong>informatif et non-commercial</strong>.</p>
+                    <h2>Application de la loi AGEC</h2>
+                    <p>Velqora Motors ne commercialisant aucun véhicule, ces obligations <strong>ne s'appliquent pas directement</strong> à ce site.</p>
+                    <h2>Notre engagement</h2>
+                    <ul>
+                        <li>Ne pas utiliser de mentions environnementales trompeuses.</li>
+                        <li>Indiquer clairement que les données techniques présentées sont informatives.</li>
+                        <li>Vous orienter vers les sources officielles des constructeurs.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="glass-dark mt-20 border-t border-white/10 pt-12 pb-8 text-xs text-zinc-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+                <div class="md:col-span-2">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <img src="VelqoraMotorsLogo.jpg" alt="Velqora Motors" class="h-7 w-auto object-contain" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div style="display:none" class="w-6 h-6 rounded-lg bg-white flex items-center justify-center text-black font-black text-xs">V</div>
+                        <span class="font-bold text-zinc-300 tracking-wider">VELQORA MOTORS // 2026</span>
+                    </div>
+                    <p class="text-xs text-zinc-400 leading-relaxed max-w-md" data-i18n="footer.tagline">Le showroom digital des hypercars et voitures d'exception. Conçu pour l'excellence et la vitesse.</p>
+                    <p class="mt-4 text-[11px] text-zinc-500"><i class="fa-solid fa-universal-access mr-1"></i><span data-i18n="footer.accessibility">Accessibilité : partiellement conforme</span> — <a href="#" onclick="switchView('accessibility'); return false;" class="underline" data-i18n="footer.accessibilityLink">Voir la déclaration</a></p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white text-xs mb-4 uppercase tracking-wider" data-i18n="footer.legalTitle">Informations légales</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="#" onclick="switchView('legal'); return false;" data-i18n="footer.legal">Mentions légales</a></li>
+                        <li><a href="#" onclick="switchView('privacy'); return false;" data-i18n="footer.privacy">Politique de confidentialité</a></li>
+                        <li><a href="#" onclick="switchView('cookies'); return false;" data-i18n="footer.cookiesLink">Gestion des cookies</a></li>
+                        <li><a href="#" onclick="switchView('cgv'); return false;" data-i18n="footer.cgv">Conditions d'utilisation</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white text-xs mb-4 uppercase tracking-wider" data-i18n="footer.helpTitle">Aide & Conformité</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="#" onclick="switchView('cursor'); return false;" data-i18n="footer.cursor">Personnaliser le curseur</a></li>
+                        <li><a href="#" onclick="switchView('accessibility'); return false;" data-i18n="footer.accessibilityLink2">Déclaration d'accessibilité</a></li>
+                        <li><a href="#" onclick="switchView('agec'); return false;" data-i18n="footer.agec">Transparence & environnement</a></li>
+                        <li><a href="#" onclick="resetCookieConsent(); return false;" data-i18n="footer.modifyCookies">Modifier mes préférences cookies</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-6 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-3 text-[11px] text-zinc-500">
+                <p data-i18n="footer.copyright">&copy; 2026 Velqora Motors SAS — Tous droits réservés.</p>
+                <p data-i18n="footer.notice">Site vitrine informatif — Aucune vente en ligne</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 z-50 px-3 py-2.5 bg-charcoal-900/95 backdrop-blur-md border-t border-white/10 hidden">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5">
+            <p class="text-[11px] text-zinc-300 text-center sm:text-left leading-snug">
+                <span data-i18n="cookies.text">🍪 Cookies pour le fonctionnement du site et la mesure d'audience.</span>
+                <a href="#" onclick="switchView('cookies'); return false;" class="underline hover:text-white transition-colors" data-i18n="cookies.learnMore">En savoir plus</a>.
+            </p>
+            <div class="flex gap-2 shrink-0">
+                <button onclick="acceptCookies()" class="px-4 py-1.5 rounded-lg bg-white text-black font-bold text-[10px] uppercase tracking-wider hover:bg-zinc-200 transition-all" data-i18n="cookies.accept">Accepter</button>
+                <button onclick="refuseCookies()" class="px-4 py-1.5 rounded-lg bg-white/10 text-white font-bold text-[10px] uppercase tracking-wider border border-white/15 hover:bg-white/20 transition-all" data-i18n="cookies.refuse">Refuser</button>
+            </div>
+        </div>
+    </div>
+
+    <button id="back-to-top" onclick="scrollToTop()" aria-label="Retour en haut de page" data-i18n-aria-label="backToTop"
+            class="fixed bottom-6 left-6 z-40 w-11 h-11 rounded-full glass-dark border border-white/15 flex items-center justify-center text-white shadow-2xl hover:bg-white/10 transition-colors">
+        <i class="fa-solid fa-arrow-up text-sm" aria-hidden="true"></i>
+    </button>
+
+    <div id="lightbox" role="dialog" aria-modal="true" aria-label="Galerie photos" data-i18n-aria-label="lightbox.aria" class="fixed inset-0 z-[100] bg-black/95 backdrop-blur-md hidden items-center justify-center">
+        <button onclick="closeLightbox()" aria-label="Fermer" data-i18n-aria-label="lightbox.close" class="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white text-xl z-10"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        <button onclick="lightboxNav(-1)" aria-label="Image précédente" data-i18n-aria-label="lightbox.prev" class="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white text-xl z-10"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+        <button onclick="lightboxNav(1)" aria-label="Image suivante" data-i18n-aria-label="lightbox.next" class="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white text-xl z-10"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+        <img id="lightbox-img" src="" alt="" class="max-w-[90vw] max-h-[85vh] object-contain rounded-2xl shadow-2xl">
+        <div id="lightbox-counter" class="absolute bottom-6 left-1/2 -translate-x-1/2 text-xs text-white/70 font-bold tracking-widest bg-black/40 px-3 py-1.5 rounded-full"></div>
+    </div>
+
+    <div id="toast" role="status" aria-live="polite" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-charcoal-800 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 text-xs font-bold border border-white/15">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-white" aria-hidden="true"></i>
+        <span id="toast-message">Notification</span>
+    </div>
+
+</body>
+</html>

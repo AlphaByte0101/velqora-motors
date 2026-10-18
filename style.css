@@ -1,0 +1,283 @@
+/* ============================================================
+   🌑 BASE
+   ============================================================ */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #050507;
+    color: #f8fafc;
+}
+
+.glass-dark {
+    background: rgba(12, 13, 16, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.glass-card {
+    background: rgba(18, 19, 24, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #050507; }
+::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+
+/* Pages légales */
+.legal-page h2 { font-size: 1.125rem; font-weight: 700; color: #fff; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+.legal-page p { margin-bottom: 0.75rem; }
+.legal-page ul { list-style: disc; padding-left: 1.25rem; margin-bottom: 0.75rem; }
+.legal-page li { margin-bottom: 0.25rem; }
+.legal-page strong { color: #fff; }
+.legal-page a { color: #fff; text-decoration: underline; }
+.legal-page code { background: rgba(255,255,255,0.08); padding: 0.1rem 0.4rem; border-radius: 4px; font-size: 0.85em; }
+
+.legal-notice {
+    background: rgba(251, 191, 36, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    color: #fbbf24;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.legal-notice.hidden { display: none; }
+
+/* ============================================================
+   ♿ ACCESSIBILITÉ — focus visible (RGAA)
+   ============================================================ */
+*:focus { outline: none; }
+*:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 2px;
+    border-radius: 6px;
+}
+
+/* ============================================================
+   ⬆️ BOUTON RETOUR EN HAUT
+   ============================================================ */
+#back-to-top {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    transform: translateY(10px);
+}
+#back-to-top.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+/* ============================================================
+   🌍 SÉLECTEUR DE LANGUE
+   ============================================================ */
+#lang-menu { animation: langFade 0.15s ease-out; }
+@keyframes langFade {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.lang-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.65rem 0.9rem;
+    text-align: left;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #d4d4d8;
+    transition: background 0.15s;
+}
+.lang-item:hover,
+.lang-item[aria-selected="true"] { background: rgba(255,255,255,0.06); color: #fff; }
+.lang-item[aria-selected="true"]::after {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    margin-left: auto;
+    font-size: 0.7rem;
+    color: #fff;
+}
+
+/* ============================================================
+   🖱️ CURSEUR PERSONNALISÉ (uniquement si vraie souris)
+   ============================================================ */
+@media (hover: hover) and (pointer: fine) {
+    html, body { cursor: none !important; }
+    body *:not(input):not(textarea):not(select):not(option) { cursor: none !important; }
+    input[type="text"], input[type="search"], textarea { cursor: text !important; }
+    select, option, button, a, [onclick], label, .energy-btn { cursor: pointer !important; }
+
+    #custom-cursor {
+        position: fixed; top: 0; left: 0;
+        pointer-events: none; z-index: 9999;
+        will-change: transform;
+        transform: translate(-100px, -100px) translate(-50%, -50%);
+        transition: opacity 0.2s ease;
+    }
+    #custom-cursor-dot {
+        position: fixed; top: 0; left: 0;
+        pointer-events: none; z-index: 10000;
+        will-change: transform;
+        transform: translate(-100px, -100px) translate(-50%, -50%);
+        transition: opacity 0.2s ease;
+    }
+
+    body[data-cursor="ring"] #custom-cursor {
+        width: 20px; height: 20px;
+        border: 1.5px solid #ffffff;
+        border-radius: 50%;
+        background: transparent;
+        mix-blend-mode: difference;
+    }
+    body[data-cursor="ring"] #custom-cursor-dot {
+        width: 2px; height: 2px;
+        background: #ffffff; border-radius: 50%;
+        mix-blend-mode: difference;
+    }
+
+    body[data-cursor="mercedes"] #custom-cursor {
+        width: 22px; height: 22px;
+        border: none; border-radius: 0;
+        background: url('Cursor/Mercedes/Cursor-Mercedes.png') center/contain no-repeat;
+        mix-blend-mode: normal;
+        opacity: 0.92;
+    }
+    body[data-cursor="mercedes"] #custom-cursor-dot { display: none !important; }
+
+    body[data-cursor="audi"] #custom-cursor {
+        width: 22px; height: 22px;
+        border: none; border-radius: 0;
+        background: url('Cursor/Audi/Cursor-Audi.png') center/contain no-repeat;
+        mix-blend-mode: normal;
+        opacity: 0.92;
+    }
+    body[data-cursor="audi"] #custom-cursor-dot { display: none !important; }
+}
+
+@media (hover: none), (pointer: coarse) {
+    #custom-cursor, #custom-cursor-dot { display: none !important; }
+}
+
+/* Aperçus des curseurs (page "Curseur") */
+.cursor-preview {
+    width: 80px; height: 80px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    color: #ffffff;
+}
+.cursor-preview-ring::before {
+    content: '';
+    width: 36px; height: 36px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+}
+.cursor-preview-ring::after {
+    content: '';
+    width: 5px; height: 5px;
+    background: currentColor; border-radius: 50%;
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+}
+.cursor-preview-mercedes::before {
+    content: '';
+    width: 48px; height: 48px;
+    background: url('Cursor/Mercedes/Cursor-Mercedes.png') center/contain no-repeat;
+}
+.cursor-preview-audi::before {
+    content: '';
+    width: 48px; height: 48px;
+    background: url('Cursor/Audi/Cursor-Audi.png') center/contain no-repeat;
+}
+
+/* ============================================================
+   📱 ADAPTATION MOBILE (max-width: 768px)
+   ============================================================ */
+@media (max-width: 768px) {
+    html, body {
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+        overscroll-behavior-y: none;
+    }
+
+    #back-to-top { bottom: 16px; left: 12px; width: 42px; height: 42px; }
+    #toast { bottom: 16px; right: 12px; left: 12px; justify-content: center; padding: 12px 16px; }
+    #cookie-banner { bottom: 0; }
+
+    header > div:first-child { height: 60px; }
+    header img[alt="Velqora Motors"] { height: 32px; }
+
+    #mobile-menu { animation: slideDown 0.25s ease-out; }
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-8px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    #mobile-menu button { min-height: 52px; }
+
+    #view-catalog > div:first-child {
+        min-height: 320px !important;
+        padding: 24px 20px !important;
+        border-radius: 20px !important;
+    }
+    #view-catalog > div:first-child h1 { font-size: 2rem !important; line-height: 1.05 !important; }
+    #view-catalog > div:first-child p { font-size: 13px !important; }
+
+    #view-catalog > div:first-child .flex-wrap {
+        flex-direction: column;
+        gap: 10px;
+    }
+    #view-catalog > div:first-child .flex-wrap > * {
+        width: 100%;
+        justify-content: center;
+    }
+
+    #showroom-grid { padding: 16px !important; border-radius: 20px !important; }
+
+    #mobile-filter-toggle { display: flex; }
+    #mobile-filters-panel.collapsed { display: none; }
+
+    #cars-grid { gap: 16px; }
+    #cars-grid .glass-card { border-radius: 20px; }
+    #cars-grid .h-60 { height: 200px !important; }
+
+    #details-content .lg\:col-span-2 { height: 260px !important; }
+    #details-content .h-\[180px\] { height: 140px !important; }
+    #details-content h1 { font-size: 1.75rem !important; }
+
+    #comparator-table-container { position: relative; }
+    #comparator-table-container::after {
+        content: '⟵ ⟶';
+        display: block;
+        text-align: center;
+        font-size: 10px;
+        color: #71717a;
+        padding: 8px;
+        background: rgba(12, 13, 16, 0.6);
+    }
+    #comparator-matrix th, #comparator-matrix td { white-space: nowrap; }
+
+    #lightbox button { width: 44px !important; height: 44px !important; }
+
+    input[type="text"], select, textarea { font-size: 16px !important; }
+
+    button { min-height: 40px; }
+
+    .legal-page h1 { font-size: 1.5rem !important; }
+    .legal-page h2 { font-size: 1rem !important; }
+
+    main { padding: 16px !important; gap: 24px !important; }
+
+    #lang-dropdown-desktop { display: none; }
+}
+
+/* Utilitaires conditionnels */
+body.is-mobile .desktop-only { display: none !important; }
+body:not(.is-mobile) .mobile-only { display: none !important; }
